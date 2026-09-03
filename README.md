@@ -78,6 +78,28 @@ module "lightsail" {
 | DNS | `domain_name` | DNS zone and `domain_entries` records |
 | Alarms | `alarms` | native Lightsail alarms |
 
+## Resource naming
+
+Lightsail resource names are unique per Region **across resource types**, so a
+single `name` cannot be shared by an instance, its key pair, a load balancer and
+a database. The module derives a distinct name per family from `name`, and the
+instance keeps the bare value because it is what callers refer to from outside:
+
+| Family | Default name | Override |
+|---|---|---|
+| Instance | `<name>` | `instance.name` |
+| Key pair | `<name>-key` | `key_pair.name` |
+| Static IP | `<name>-ip` | `static_ip_name` |
+| Disk | `<name>-<disks key>` | `disks[*].name` |
+| Load balancer | `<name>-lb` | `lb.name` |
+| Load balancer certificate | `<name>-lb-cert` | `lb_certificate.name` |
+| Database | `<name>-db` | `database.relational_database_name` |
+| Bucket | `<name>-bucket` | `bucket.name` |
+| Certificate | `<name>-cert` | `certificate.name` |
+| Distribution | `<name>-cdn` | `distribution.name` |
+| Container service | `<name>-cs` | `container_service.name` |
+| Alarm | `<name>-<alarms key>` | `alarms[*].alarm_name` |
+
 ## Alarms need a contact method
 
 Lightsail alarms notify a **contact method**, which is a singleton per account
@@ -253,7 +275,7 @@ No modules.
 | <a name="input_lb_certificate_attach"></a> [lb\_certificate\_attach](#input\_lb\_certificate\_attach) | Whether to attach lb\_certificate to the load balancer. Attachment only succeeds after the certificate is validated, so this is usually enabled on a second apply. | `bool` | `false` | no |
 | <a name="input_lb_https_redirection_enabled"></a> [lb\_https\_redirection\_enabled](#input\_lb\_https\_redirection\_enabled) | Whether to redirect HTTP to HTTPS on the load balancer. Set to null to leave the policy unmanaged. Requires an attached certificate. | `bool` | `null` | no |
 | <a name="input_lb_stickiness"></a> [lb\_stickiness](#input\_lb\_stickiness) | Session stickiness policy for the load balancer. Set to null to leave it unmanaged. | <pre>object({<br/>    enabled         = bool<br/>    cookie_duration = number<br/>  })</pre> | `null` | no |
-| <a name="input_name"></a> [name](#input\_name) | Base name applied to the Lightsail resources created by this module. Each resource family accepts an optional name of its own that overrides this value. | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Base name for the Lightsail resources created by this module. The instance takes it unchanged; every other family derives a suffixed name from it, because Lightsail resource names are unique per Region across resource types. Each family accepts an optional name of its own that overrides this. | `string` | n/a | yes |
 | <a name="input_public_ports"></a> [public\_ports](#input\_public\_ports) | Public port rules for the instance firewall. An empty list leaves the Lightsail defaults untouched; a non-empty list becomes the authoritative rule set. | <pre>list(object({<br/>    from_port         = number<br/>    to_port           = number<br/>    protocol          = string<br/>    cidrs             = optional(set(string))<br/>    ipv6_cidrs        = optional(set(string))<br/>    cidr_list_aliases = optional(set(string))<br/>  }))</pre> | `[]` | no |
 | <a name="input_static_ip_name"></a> [static\_ip\_name](#input\_static\_ip\_name) | Name of the static IP. Defaults to "<name>-ip". | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags applied to every taggable resource created by this module. | `map(string)` | `{}` | no |

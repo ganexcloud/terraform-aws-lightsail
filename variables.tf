@@ -3,7 +3,7 @@
 ###############################################################################
 
 variable "name" {
-  description = "Base name applied to the Lightsail resources created by this module. Each resource family accepts an optional name of its own that overrides this value."
+  description = "Base name for the Lightsail resources created by this module. The instance takes it unchanged; every other family derives a suffixed name from it, because Lightsail resource names are unique per Region across resource types. Each family accepts an optional name of its own that overrides this."
   type        = string
 }
 

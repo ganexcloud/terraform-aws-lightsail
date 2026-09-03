@@ -18,9 +18,18 @@ resource "aws_lightsail_bucket_access_key" "this" {
   bucket_name = aws_lightsail_bucket.this[0].name
 }
 
+# for_each keys stay config-known while resource_name may resolve to the
+# instance this module creates, so Terraform orders the grant after it exists.
 resource "aws_lightsail_bucket_resource_access" "this" {
-  for_each = local.bucket_enabled ? local.bucket_resource_access : []
+  for_each = local.bucket_enabled ? toset(var.bucket_resource_access) : []
 
   bucket_name   = aws_lightsail_bucket.this[0].name
-  resource_name = each.value
+  resource_name = each.value == "self" ? one(aws_lightsail_instance.this[*].name) : each.value
+
+  lifecycle {
+    precondition {
+      condition     = each.value != "self" || var.instance != null
+      error_message = "bucket_resource_access uses \"self\" but the module does not create an instance."
+    }
+  }
 }

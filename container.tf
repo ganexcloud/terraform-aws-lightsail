@@ -5,6 +5,9 @@
 resource "aws_lightsail_container_service" "this" {
   count = local.container_service_enabled ? 1 : 0
 
+  # public_domain_names references a certificate by name, with no implicit edge.
+  depends_on = [aws_lightsail_certificate.this]
+
   name        = local.container_service_name
   power       = var.container_service.power
   scale       = var.container_service.scale
