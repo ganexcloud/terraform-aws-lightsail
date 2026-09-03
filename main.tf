@@ -8,7 +8,7 @@
 resource "aws_lightsail_key_pair" "this" {
   count = local.create_key_pair ? 1 : 0
 
-  name       = coalesce(var.key_pair.name, var.name)
+  name       = coalesce(var.key_pair.name, local.key_pair_default_name)
   public_key = var.key_pair.public_key
   pgp_key    = var.key_pair.pgp_key
   tags       = var.tags

@@ -24,7 +24,7 @@ resource "awscc_lightsail_alarm" "this" {
 
   lifecycle {
     precondition {
-      condition     = local.alarm_monitored_resource_name != null
+      condition     = var.alarm_monitored_resource_name != null || var.instance != null
       error_message = "Alarms need a target: set alarm_monitored_resource_name, or let the module create an instance."
     }
   }

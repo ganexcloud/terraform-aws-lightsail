@@ -18,6 +18,15 @@ resource "aws_lightsail_certificate" "this" {
 resource "aws_lightsail_distribution" "this" {
   count = local.distribution_enabled ? 1 : 0
 
+  # origin.name and certificate_name arrive as plain strings, so they carry no
+  # implicit edge even when they name a resource this module creates.
+  depends_on = [
+    aws_lightsail_instance.this,
+    aws_lightsail_bucket.this,
+    aws_lightsail_lb.this,
+    aws_lightsail_certificate.this,
+  ]
+
   name             = local.distribution_name
   bundle_id        = var.distribution.bundle_id
   certificate_name = var.distribution.certificate_name
